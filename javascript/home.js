@@ -24,9 +24,8 @@ $(".search-bar form").submit(function (e) {
   if (q != "") {
     thisForm = $(this);
     $.ajax({
-      type: "POST",
-      url: thisForm.attr("action"),
-      data: thisForm.serialize(),
+      type: "GET",
+      url: thisForm.attr("action") + q,
       success: function (response) {
         response.results.forEach(function (result) {
           item = $(".search-result.hidden").clone();
