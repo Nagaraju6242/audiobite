@@ -50,7 +50,7 @@ function playsong(e) {
   $(".search-results").find(".search-result:not('.hidden')").remove();
   $.ajax({
     type: "GET",
-    url: "/getsong/?q=" + video_id,
+    url: "/api/getsong/?q=" + video_id,
     success: function (response) {
       setSong(response);
     },
@@ -123,7 +123,7 @@ function add_query(list) {
 
 function search(q) {
   $.ajax({
-    url: "/search",
+    url: "/api/search",
     type: "get",
     data: {
       q: q,
