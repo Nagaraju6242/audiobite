@@ -141,8 +141,16 @@ nav p {
 
 .music-body {
   width: 28%;
+  min-width: 300px;
   background-color: #ecf0f1;
   box-shadow: 0 1px 4px rgb(0 0 0 / 25%);
+}
+
+@media screen and (max-width: 300px){
+  .music-body{
+    width: 90%;
+    min-width: 90%;
+  }
 }
 
 .music-body .thumbnail-holder {
