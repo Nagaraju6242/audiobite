@@ -9,10 +9,7 @@
     <link rel="icon" type="image/png" href="images/icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <!-- <link
-      href="https://fonts.googleapis.com/css2?family=Merriweather+Sans&family=Montserrat:wght@500&display=swap"
-      rel="stylesheet"
-    /> -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/home.css" />
   </head>
   <body>
@@ -157,7 +154,7 @@
     </nav>
     <div class="music-body">
       <div class="thumbnail-holder">
-        <img src="images/no-song.png" alt="" />
+        <img src="images/no-song.png" alt="Thumbnail" />
         <span>i</span>
         <div class="bio">
           <p></p>
@@ -229,6 +226,13 @@
         </div>
       </div>
     </div>
+    <div class="recommendations">
+      <div class="recomm-result hidden" onclick="playsong($(this))">
+        <img class="thumbnail" src="" alt="Thumbnail" />
+        <div class="title"></div>
+      </div>
+    </div>
+
     <script src="javascript/home.js"></script>
   </body>
 </html>

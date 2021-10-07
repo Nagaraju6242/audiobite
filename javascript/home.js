@@ -56,6 +56,30 @@ function playsong(e) {
   });
 }
 
+function loadRecommendations(video_id) {
+  $.ajax({
+    url: "/api/recommendations",
+    type: "get",
+    data: {
+      id: video_id,
+    },
+    success: function (response) {
+      if (response.results.length != 0) {
+        response.results.forEach((card) => {
+          new_card = $(".recommendations .recomm-result.hidden").clone();
+          new_card.removeClass("hidden");
+          new_card.attr("data-id", card.videoId);
+          new_card.find("img").attr("src", card.thumbnail);
+          new_card.find(".title").text(card.title);
+          $(".recommendations").append(new_card);
+        });
+        $(".recommendations").css("display", "block");
+      }
+    },
+    error: function (xhr) {},
+  });
+}
+
 function setSong(response) {
   url = response.playurl;
   video_id = response.video_id;
@@ -75,6 +99,7 @@ function setSong(response) {
   $("#circle").attr("class", "");
   $("#from_play_to_pause")[0].beginElement();
   player[0].play();
+  loadRecommendations(video_id);
 }
 
 function play_pause() {
@@ -90,8 +115,10 @@ function play_pause() {
 }
 
 $(".progress-bar").on("click", function (e) {
-  reqSeek = e.offsetX / e.target.offsetWidth;
-  player[0].currentTime = reqSeek * player[0].duration;
+  if (player[0].src != ""){
+    reqSeek = e.offsetX / e.target.offsetWidth;
+    player[0].currentTime = reqSeek * player[0].duration;
+  } 
 });
 
 $("body").click(function () {
