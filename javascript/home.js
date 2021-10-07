@@ -65,6 +65,7 @@ function loadRecommendations(video_id) {
     },
     success: function (response) {
       if (response.results.length != 0) {
+        $(".recommendations .recomm-result:not('.hidden')").remove();
         response.results.forEach((card) => {
           new_card = $(".recommendations .recomm-result.hidden").clone();
           new_card.removeClass("hidden");
@@ -103,14 +104,16 @@ function setSong(response) {
 }
 
 function play_pause() {
-  if (player[0].paused) {
-    $("#circle").attr("class", "");
-    $("#from_play_to_pause")[0].beginElement();
-    player[0].play();
-  } else {
-    $("#circle").attr("class", "play");
-    $("#from_pause_to_play")[0].beginElement();
-    player[0].pause();
+  if(player[0].src != location.href){
+    if (player[0].paused) {
+      $("#circle").attr("class", "");
+      $("#from_play_to_pause")[0].beginElement();
+      player[0].play();
+    } else {
+      $("#circle").attr("class", "play");
+      $("#from_pause_to_play")[0].beginElement();
+      player[0].pause();
+    }
   }
 }
 
