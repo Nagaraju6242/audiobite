@@ -6,8 +6,9 @@ current_video_id = ''
 
 window.onload = function(){
   video_id = localStorage.getItem("video_id");
-  if(video_id != ""){
-    playsong("","js");
+  if (video_id && video_id != "") {
+    current_video_id = video_id;
+    playsong("", "js");
   }
 }
 
