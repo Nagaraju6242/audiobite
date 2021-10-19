@@ -59,7 +59,7 @@ $(".search-bar form").submit(function (e) {
 });
 
 function playsong(e,type) {
-  $(".loading").addClass("active");
+  $(".loading").addClass("active");''
   if(type == "html"){
     video_id = e.attr("data-id");
   }else{
