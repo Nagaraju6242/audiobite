@@ -72,7 +72,7 @@ function playsong(e,type) {
     type: "GET",
     url: "/api/getsong/?q=" + video_id,
     success: function (response) {
-      setSong(response);
+      setSong(response, type);
     },
   });
 }
@@ -107,7 +107,7 @@ function loadRecommendations(video_id) {
   });
 }
 
-function setSong(response) {
+function setSong(response,type) {
   url = response.playurl;
   video_id = response.video_id;
   title = response.title;
@@ -115,7 +115,7 @@ function setSong(response) {
   player.attr("src", response.playurl);
   $(".music-body .thumbnail-holder img").attr(
     "src",
-    `http://img.youtube.com/vi/${video_id}/maxresdefault.jpg`
+    `https://img.youtube.com/vi/${video_id}/maxresdefault.jpg`
   );
   $(".music-body .song-name").text(title);
   if (description.length > 255) {
@@ -126,6 +126,9 @@ function setSong(response) {
   $("#circle").attr("class", "");
   $("#from_play_to_pause")[0].beginElement();
   player[0].play();
+  if(type == "js"){
+    player[0].currentTime = localStorage.getItem("timestamp");
+  }
   loadRecommendations(video_id);
   current_video_id = video_id;
 }
