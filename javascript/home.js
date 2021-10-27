@@ -10,6 +10,9 @@ window.onload = function(){
     current_video_id = video_id;
     playsong("", "js");
   }
+  $(".music-body").tilt({
+    perspective: 1000,
+  });
 }
 
 player[0].ontimeupdate = function () {
@@ -164,16 +167,23 @@ $(".search-bar form input[type='text']").on("input", function (e) {
   search(e.target.value);
 });
 
+$(".search-bar form input[type='text']").on("keydown",function (e) {
+  if(e.keyCode == 40){
+    $(".query-results .query:first-child").focus();
+  }
+});
+
 function set_query(e) {
   var data = e.target.innerText;
   $(".search-bar form input[type='text']").val(data);
   $(".search-bar form").submit();
+
 }
 
 function add_query(list) {
   $(".query-results").html("");
   list.forEach((li) => {
-    query = $("<div>");
+    query = $("<button>");
     query[0].onclick = set_query;
     query.addClass("query").html(li[0]).appendTo(".query-results");
   });
@@ -183,6 +193,7 @@ function add_query(list) {
 function search(q) {
   $.ajax({
     url: "/api/search",
+    // url : "/sample.json",
     type: "get",
     data: {
       q: q,
@@ -213,3 +224,29 @@ window.onkeydown = (e) => {
     }
   }
 };
+
+$(".query-results").on("keydown", function (e) {
+  var index = $(":focus").index() + 1;
+  if (e.which === 38) {
+    $(".query-results .query:nth-child(" + (index - 1) + ")").focus();
+  } else if (e.which === 40) {
+    $(".query-results .query:nth-child(" + (index + 1) + ")").focus();
+  }
+});
+
+// (function (history) {
+//   var pushState = history.pushState;
+//   history.pushState = function (state) {
+//     if (typeof history.onpushstate == "function") {
+//       history.onpushstate({
+//         state: state,
+//       });
+//     }
+//     return pushState.apply(history, arguments);
+//   };
+// })(window.history);
+
+
+// window.onpopstate = history.onpushstate = function (e) {
+  // console.log(location.pathname);
+// };

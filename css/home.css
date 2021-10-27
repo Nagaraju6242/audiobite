@@ -307,10 +307,19 @@ nav p {
 .query-results .query {
   padding: 5px 10px;
   cursor: pointer;
+  width: 100%;
+  text-align: left;
+  display: block;
+  font-size: 14px;
 }
 
 .query-results .query:hover {
   background-color: #ccc;
+}
+
+.query-results .query:focus {
+  background-color: #ccc;
+  border: 1px solid #111;
 }
 
 
