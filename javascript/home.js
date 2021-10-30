@@ -15,6 +15,10 @@ window.onload = function(){
   $(".music-body").tilt({
     perspective: 1000,
   });
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/sw.js");
+  }
 }
 
 player[0].ontimeupdate = function () {
@@ -32,7 +36,6 @@ player[0].ontimeupdate = function () {
 };
 
 player[0].onerror = function(e){
-  console.log(player[0].src);
   if (player[0].src != location.href) {
     errorPopup(playsong, {}, "player");
   }
@@ -106,7 +109,8 @@ function loadRecommendations(video_id) {
           new_card.find(".title").text(card.title);
           $(".recommendations").append(new_card);
         });
-        $(".recommendations").css("display", "block");
+        $(".recommendations")[0].scrollTo(0, 0);
+        $(".recommendations").css("display", "block"); 
       }
     },
     error: function (xhr) {},
