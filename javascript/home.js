@@ -5,11 +5,13 @@ $("#from_pause_to_play")[0].beginElement();
 current_video_id = ''
 
 window.onload = function(){
-  video_id = localStorage.getItem("video_id");
-  if (video_id && video_id != "") {
-    current_video_id = video_id;
+  path = location.pathname;
+  if(path.startsWith("/v/")){
+    path = path.slice(3).replaceAll("/", "");
+    current_video_id = path;
     playsong("", "js");
   }
+  
   $(".music-body").tilt({
     perspective: 1000,
   });
@@ -27,13 +29,8 @@ player[0].ontimeupdate = function () {
   $(".music-data .time-stamp").text(minutes + " : " + seconds);
   reqwidth = player[0].currentTime / player[0].duration;
   $(".music-body .progress-bar .inner").css("width", reqwidth * 100 + "%");
-  setLocalStorage(player[0].currentTime);
 };
 
-player[0].onended = function(){
-  localStorage.setItem("video_id", "");
-  localStorage.setItem("timestamp", 0);
-}
 
 $(".search-bar form").submit(function (e) {
   e.preventDefault();
@@ -66,7 +63,7 @@ function playsong(e,type) {
   if(type == "html"){
     video_id = e.attr("data-id");
   }else{
-    video_id = localStorage.getItem("video_id");
+    video_id = current_video_id;
   }
   
   $(".search-results").removeClass("active");
@@ -75,15 +72,15 @@ function playsong(e,type) {
     type: "GET",
     url: "/api/getsong/?q=" + video_id,
     success: function (response) {
-      setSong(response, type);
+      if("error" in response){
+        errorPopup(playsong,e,type);
+      }else{
+        setSong(response);
+      }
     },
   });
 }
 
-function setLocalStorage(timestamp) {
-  localStorage.setItem("video_id", current_video_id);
-  localStorage.setItem("timestamp", timestamp);
-}
 
 function loadRecommendations(video_id) {
   $.ajax({
@@ -110,7 +107,7 @@ function loadRecommendations(video_id) {
   });
 }
 
-function setSong(response,type) {
+function setSong(response) {
   url = response.playurl;
   video_id = response.video_id;
   title = response.title;
@@ -129,9 +126,6 @@ function setSong(response,type) {
   $("#circle").attr("class", "");
   $("#from_play_to_pause")[0].beginElement();
   player[0].play();
-  if(type == "js"){
-    player[0].currentTime = localStorage.getItem("timestamp");
-  }
   loadRecommendations(video_id);
   current_video_id = video_id;
 }
@@ -224,6 +218,23 @@ window.onkeydown = (e) => {
     }
   }
 };
+
+function errorPopup(callback, e, type) {
+  $.confirm({
+    title: "Encountered an error!",
+    content: "Something went Wrong",
+    type: "red",
+    typeAnimated: true,
+    buttons: {
+      tryAgain: {
+        text: "Try again",
+        btnClass: "btn-red",
+        action: function(){ callback(e,type); },
+      },
+      close: function () {},
+    },
+  });
+}
 
 $(".query-results").on("keydown", function (e) {
   var index = $(":focus").index() + 1;
