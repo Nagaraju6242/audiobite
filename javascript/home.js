@@ -31,6 +31,10 @@ player[0].ontimeupdate = function () {
   $(".music-body .progress-bar .inner").css("width", reqwidth * 100 + "%");
 };
 
+player[0].onerror = function(){
+  errorPopup(playsong, {}, "player");
+}
+
 
 $(".search-bar form").submit(function (e) {
   e.preventDefault();
@@ -59,13 +63,13 @@ $(".search-bar form").submit(function (e) {
 });
 
 function playsong(e,type) {
-  $(".loading").addClass("active");''
+  $(".loading").addClass("active");
   if(type == "html"){
     video_id = e.attr("data-id");
   }else{
     video_id = current_video_id;
   }
-  
+  history.pushState({}, "", "/v/" + video_id);
   $(".search-results").removeClass("active");
   $(".search-results").find(".search-result:not('.hidden')").remove();
   $.ajax({
@@ -220,20 +224,27 @@ window.onkeydown = (e) => {
 };
 
 function errorPopup(callback, e, type) {
-  $.confirm({
+  config = {
     title: "Encountered an error!",
     content: "Something went Wrong",
     type: "red",
     typeAnimated: true,
     buttons: {
-      tryAgain: {
+      close: function () {
+        $(".loading").removeClass("active");
+      },
+    },
+  };
+  if(type != "player"){
+    config["buttons"]["tryAgain"] = {
         text: "Try again",
         btnClass: "btn-red",
-        action: function(){ callback(e,type); },
-      },
-      close: function () {},
-    },
-  });
+        action: function(){ 
+          callback(e,type); 
+        },
+      };
+  }
+  $.confirm(config);
 }
 
 $(".query-results").on("keydown", function (e) {
@@ -259,5 +270,5 @@ $(".query-results").on("keydown", function (e) {
 
 
 // window.onpopstate = history.onpushstate = function (e) {
-  // console.log(location.pathname);
+//   console.log(e);
 // };
