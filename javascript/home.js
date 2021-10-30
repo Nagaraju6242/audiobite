@@ -31,10 +31,12 @@ player[0].ontimeupdate = function () {
   $(".music-body .progress-bar .inner").css("width", reqwidth * 100 + "%");
 };
 
-player[0].onerror = function(){
-  errorPopup(playsong, {}, "player");
+player[0].onerror = function(e){
+  console.log(player[0].src);
+  if (player[0].src != location.href) {
+    errorPopup(playsong, {}, "player");
+  }
 }
-
 
 $(".search-bar form").submit(function (e) {
   e.preventDefault();
@@ -256,19 +258,11 @@ $(".query-results").on("keydown", function (e) {
   }
 });
 
-// (function (history) {
-//   var pushState = history.pushState;
-//   history.pushState = function (state) {
-//     if (typeof history.onpushstate == "function") {
-//       history.onpushstate({
-//         state: state,
-//       });
-//     }
-//     return pushState.apply(history, arguments);
-//   };
-// })(window.history);
-
-
-// window.onpopstate = history.onpushstate = function (e) {
-//   console.log(e);
-// };
+window.onpopstate = function (e) {
+  path = location.pathname;
+  if (path.startsWith("/v/")) {
+    path = path.slice(3).replaceAll("/", "");
+    current_video_id = path;
+    playsong("", "js");
+  }
+};
