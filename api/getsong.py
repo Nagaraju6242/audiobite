@@ -1,6 +1,6 @@
 from http.server import BaseHTTPRequestHandler
 from urllib import parse
-import youtube_dl
+import yt_dlp
 import json
 
 class handler(BaseHTTPRequestHandler):
@@ -21,7 +21,7 @@ class handler(BaseHTTPRequestHandler):
         if q:
             try:
                 url = self.base_url + q
-                with youtube_dl.YoutubeDL(self.ydl_opts) as ydl:
+                with yt_dlp.YoutubeDL(self.ydl_opts) as ydl:
                     info = ydl.extract_info(url,download=False)
                     playurl = info['formats'][0]['url']
                 data = {
