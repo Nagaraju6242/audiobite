@@ -23,12 +23,13 @@ class handler(BaseHTTPRequestHandler):
                 url = self.base_url + q
                 with yt_dlp.YoutubeDL(self.ydl_opts) as ydl:
                     info = ydl.extract_info(url,download=False)
-                    playurl = info['formats'][0]['url']
+                    playurl = info.get("url")
                 data = {
                     "video_id" : q,
                     'title' : info.get("title"),
                     'description' : info.get("description"),
                     "playurl" : playurl,
+                    'thumbnail' : info.get("thumbnail")
                 }
             except:
                 data = {"error" : "Something Went Wrong"}

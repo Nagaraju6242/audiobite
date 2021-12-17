@@ -123,10 +123,7 @@ function setSong(response) {
   title = response.title;
   description = response.description;
   player.attr("src", response.playurl);
-  $(".music-body .thumbnail-holder img").attr(
-    "src",
-    `https://img.youtube.com/vi/${video_id}/maxresdefault.jpg`
-  );
+  $(".music-body .thumbnail-holder img").attr("src", response.thumbnail);
   $(".music-body .song-name").text(title);
   if (description.length > 255) {
     description = description.slice(0, 250) + "...";
