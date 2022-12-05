@@ -3,15 +3,19 @@ $("#circle").attr("class", "play");
 $("#from_pause_to_play")[0].beginElement();
 
 current_video_id = ''
+// BASE_URL = "https://audiobite.vercel.app"  // Base URL without / at the end
+BASE_URL = ""
 
-window.onload = function(){
+SONGS_QUEUE = [];
+
+window.onload = function () {
   path = location.pathname;
-  if(path.startsWith("/v/")){
+  if (path.startsWith("/v/")) {
     path = path.slice(3).replaceAll("/", "");
     current_video_id = path;
     playsong("", "js");
   }
-  
+
   $(".music-body").tilt({
     perspective: 1000,
   });
@@ -24,18 +28,26 @@ window.onload = function(){
 player[0].ontimeupdate = function () {
   minutes = parseInt(player[0].currentTime / 60);
   seconds = parseInt(player[0].currentTime % 60);
+  durMinutes = parseInt(player[0].duration / 60);
+  durSeconds = parseInt(player[0].duration % 60);
   if (minutes < 10) {
     minutes = "0" + minutes;
+  }
+  if (durMinutes < 10) {
+    durMinutes = "0" + durMinutes;
   }
   if (seconds < 10) {
     seconds = "0" + seconds;
   }
-  $(".music-data .time-stamp").text(minutes + " : " + seconds);
+  if (durSeconds < 10) {
+    durSeconds = "0" + durSeconds;
+  }
+  $(".music-data .time-stamp").text(`${minutes}:${seconds} / ${durMinutes}:${durSeconds}`);
   reqwidth = player[0].currentTime / player[0].duration;
   $(".music-body .progress-bar .inner").css("width", reqwidth * 100 + "%");
 };
 
-player[0].onerror = function(e){
+player[0].onerror = function (e) {
   if (player[0].src != location.href) {
     errorPopup(playsong, {}, "player");
   }
@@ -50,7 +62,7 @@ $(".search-bar form").submit(function (e) {
     thisForm = $(this);
     $.ajax({
       type: "GET",
-      url: thisForm.attr("action") + q,
+      url: BASE_URL + "/api/getsongs/?q=" + q,
       success: function (response) {
         response.results.forEach(function (result) {
           item = $(".search-result.hidden").clone();
@@ -67,11 +79,11 @@ $(".search-bar form").submit(function (e) {
   }
 });
 
-function playsong(e,type) {
+function playsong(e, type) {
   $(".loading").addClass("active");
-  if(type == "html"){
+  if (type == "html") {
     video_id = e.attr("data-id");
-  }else{
+  } else {
     video_id = current_video_id;
   }
   history.pushState({}, "", "/v/" + video_id);
@@ -79,11 +91,11 @@ function playsong(e,type) {
   $(".search-results").find(".search-result:not('.hidden')").remove();
   $.ajax({
     type: "GET",
-    url: "/api/getsong/?q=" + video_id,
+    url: BASE_URL + "/api/getsong/?q=" + video_id,
     success: function (response) {
-      if("error" in response){
-        errorPopup(playsong,e,type);
-      }else{
+      if ("error" in response) {
+        errorPopup(playsong, e, type);
+      } else {
         setSong(response);
       }
     },
@@ -93,7 +105,7 @@ function playsong(e,type) {
 
 function loadRecommendations(video_id) {
   $.ajax({
-    url: "/api/recommendations",
+    url: BASE_URL + "/api/recommendations",
     type: "get",
     data: {
       id: video_id,
@@ -110,10 +122,10 @@ function loadRecommendations(video_id) {
           $(".recommendations").append(new_card);
         });
         $(".recommendations")[0].scrollTo(0, 0);
-        $(".recommendations").css("display", "block"); 
+        $(".recommendations").css("display", "flex");
       }
     },
-    error: function (xhr) {},
+    error: function (xhr) { },
   });
 }
 
@@ -138,7 +150,7 @@ function setSong(response) {
 }
 
 function play_pause() {
-  if(player[0].src != location.href){
+  if (player[0].src != location.href) {
     if (player[0].paused) {
       $("#circle").attr("class", "");
       $("#from_play_to_pause")[0].beginElement();
@@ -152,10 +164,10 @@ function play_pause() {
 }
 
 $(".progress-bar").on("click", function (e) {
-  if (player[0].src != ""){
+  if (player[0].src != "") {
     reqSeek = e.offsetX / e.target.offsetWidth;
     player[0].currentTime = reqSeek * player[0].duration;
-  } 
+  }
 });
 
 $("body").click(function () {
@@ -168,8 +180,8 @@ $(".search-bar form input[type='text']").on("input", function (e) {
   search(e.target.value);
 });
 
-$(".search-bar form input[type='text']").on("keydown",function (e) {
-  if(e.keyCode == 40){
+$(".search-bar form input[type='text']").on("keydown", function (e) {
+  if (e.keyCode == 40) {
     $(".query-results .query:first-child").focus();
   }
 });
@@ -193,8 +205,7 @@ function add_query(list) {
 
 function search(q) {
   $.ajax({
-    url: "/api/search",
-    // url : "/sample.json",
+    url: BASE_URL + "/api/search",
     type: "get",
     data: {
       q: q,
@@ -209,18 +220,18 @@ function search(q) {
         $(".query-results").removeClass("active");
       }
     },
-    error: function (xhr) {},
+    error: function (xhr) { },
   });
 }
 
 
 window.onkeydown = (e) => {
   if ($(".search-bar input[name='q']")[0] !== document.activeElement) {
-    if (e.keyCode == 32) {
+    if (e.keyCode == 32 && $(".play_or_pause")[0] !== document.activeElement) {
       play_pause();
     } else if (e.keyCode == 37) {
       player[0].currentTime -= 5;
-    } else if(e.keyCode == 39){
+    } else if (e.keyCode == 39) {
       player[0].currentTime += 5;
     }
   }
@@ -235,17 +246,18 @@ function errorPopup(callback, e, type) {
     buttons: {
       close: function () {
         $(".loading").removeClass("active");
+        playNextVideo();
       },
     },
   };
-  if(type != "player"){
+  if (type != "player") {
     config["buttons"]["tryAgain"] = {
-        text: "Try again",
-        btnClass: "btn-red",
-        action: function(){ 
-          callback(e,type); 
-        },
-      };
+      text: "Try again",
+      btnClass: "btn-red",
+      action: function () {
+        callback(e, type);
+      },
+    };
   }
   $.confirm(config);
 }
@@ -267,3 +279,54 @@ window.onpopstate = function (e) {
     playsong("", "js");
   }
 };
+
+
+// Temp
+
+loadRecommendations("3kcadMVFolY")
+
+$(".recommendations").on("wheel", function (e) {
+  $(".recommendations")[0].scrollBy(e.originalEvent.deltaY, 0);
+});
+
+function playNext(e) {
+  e.stopPropagation();
+  recommCard = $(e.target).closest(".recomm-result");
+  videoId = recommCard.attr("data-id");
+  SONGS_QUEUE.unshift({ videoId: videoId, title: recommCard.find(".title").text() });
+  updatePlayQueue();
+}
+
+function addToQueue(e) {
+  e.stopPropagation();
+  recommCard = $(e.target).closest(".recomm-result");
+  videoId = recommCard.attr("data-id");
+  SONGS_QUEUE.push({ videoId: videoId, title: recommCard.find(".title").text() });
+  updatePlayQueue();
+}
+
+$("#player").on("ended", playNextVideo)
+
+function playNextVideo() {
+  if (SONGS_QUEUE.length > 0) {
+    current_video_id = SONGS_QUEUE.shift()["videoId"];
+    playsong("", "js");
+  }
+  updatePlayQueue();
+}
+
+function updatePlayQueue() {
+  $(".play-queue .queue-item:not(.hidden)").remove();
+  SONGS_QUEUE.forEach((song, index) => {
+    queueItem = $(".play-queue .queue-item.hidden").clone();
+    queueItem.removeClass("hidden");
+    queueItem.find(".info").text(song["title"]);
+    queueItem.attr("data-id", song["videoId"]);
+    queueItem.find(".remove").click(function (e) {
+      e.stopPropagation();
+      SONGS_QUEUE.splice(index, 1);
+      updatePlayQueue();
+    });
+    queueItem.appendTo(".queue-items");
+  });
+}
