@@ -281,10 +281,6 @@ window.onpopstate = function (e) {
 };
 
 
-// Temp
-
-loadRecommendations("3kcadMVFolY")
-
 $(".recommendations").on("wheel", function (e) {
   $(".recommendations")[0].scrollBy(e.originalEvent.deltaY, 0);
 });
