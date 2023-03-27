@@ -3,6 +3,6 @@ charset-normalizer==2.0.4
 idna==3.2
 requests==2.26.0
 urllib3==1.26.6
-youtube-dl==2021.6.6
+youtube-dl==2021.12.17
 youtube-search==2.1.0
-yt-dlp
+yt-dlp==2023.3.4
